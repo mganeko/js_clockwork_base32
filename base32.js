@@ -31,7 +31,7 @@ function encode32str(str) {
 
 
 /**
- * stringを受け取り、clockwork base32 デコードした文字列を返します
+ * stringを受け取り、clockwork base32 デコードしたバイト列を返します
  * @param {string}} str - 入力バイト列
  * @return {Uint8Array} - エンコード結果
  */
@@ -45,8 +45,35 @@ function decode32(str) {
     arr.push(n);
   }
   const array5bits = new Uint8Array(arr);
-  return array5bits;
+  console.log('decode32 str=', str, 'arr=', array5bits);
+
+  let decodedArray = [];
+  const buffer = array5bits.buffer;
+  const step = 8;
+  for (let offset = 0; offset < arr.length; offset += step) {
+    const chunkArray = new Uint8Array(buffer, offset, Math.min((arr.length - offset), step));
+    console.log('offset=', offset);
+    const arr8 = _decode8bytesArray(chunkArray);
+    decodedArray = arr8;
+  }
+  console.log('decode32 decodedArray=', decodedArray);
+
+  return decodedArray;
 }
+
+/**
+ * stringを受け取り、clockwork base32 デコードしたバイト列を文字列として返します
+ * @param {string} str - 入力バイト列
+ * @return {string} - エンコード結果
+ */
+function decode32str(str) {
+  const arr = decode32(str);
+ 
+  const decoder = new TextDecoder();
+  const decodedStr = decoder.decode(arr);
+  return decodedStr;
+}
+
 
 /**
  * バイトアレイを受け取り、5bit毎に分割、バイトアレイで返す
@@ -54,22 +81,13 @@ function decode32(str) {
  * @param {string}} str - 入力バイト列
  * @return {Uint8Array} - エンコード結果
  */
-function _splitArray8to5bit(arr) {
-  const newArr = new Uint8Array();
-}
-
-function encode5bytes(b0, b1, b2, b3, b4) {
-  const arr = _split40bits(b0, b1, b2, b3, b4);
-  //const arr = _split40bitsByStr(b0, b1, b2, b3, b4);
-  let str = '';
-  arr.forEach(b => { str += _encodeByte(b) });
-  return str;
-}
+// function _splitArray8to5bit(arr) {
+//   const newArr = new Uint8Array();
+// }
 
 function _encode5bytesArray(arr) {
   const newArr = _split5bytesBy5bits(arr);
   //console.log('newArr:', newArr);
-  //const arr = _split40bitsByStr(b0, b1, b2, b3, b4);
   let str = '';
   newArr.forEach(b => { str += _encodeByte(b) });
   return str;
@@ -97,6 +115,9 @@ function _split5bytesBy5bits(arr) {
   const r6 = ((b3 & 0b00000011) << 3) | ((b4 & 0b11100000) >> 5);
   const r7 = (b4 & 0b00011111);
 
+  // --- double check with another logic ---
+  _dubleCheckSplit(r0, r1, r2, r3, r4, r5, r6, r7, b0, b1, b2, b3, b4);
+
   // --- pack to array ---
   let newArr = null;
   if (len >= 5) {
@@ -121,19 +142,49 @@ function _split5bytesBy5bits(arr) {
   return newArr;
 }
 
-function _split40bits(b0, b1, b2, b3, b4) {
-  const r0 = (b0 & 0b11111000) >> 3;
-  const r1 = ((b0 & 0b00000111) << 2) | ((b1 & 0b11000000) >> 6);
-  const r2 = (b1 & 0b00111110) >> 1;
-  const r3 = ((b1 & 0b00000001) << 4) | ((b2 & 0b11110000) >> 4);
-  const r4 = ((b2 & 0b00001111) << 1) | ((b3 & 0b10000000) >> 7);
-  const r5 = ((b3 & 0b01111100) >> 2);
-  const r6 = ((b3 & 0b00000011) << 3) | ((b4 & 0b11100000) >> 5);
-  const r7 = (b4 & 0b00011111);
+function _dubleCheckSplit(r0, r1, r2, r3, r4, r5, r6, r7, b0, b1, b2, b3, b4) {
+  const arr2 = _split40bitsByStr(b0, b1, b2, b3, b4);
+  if (arr2[0] !== r0) {
+    throw 'r0 not same';
+  }
+  if (arr2[1] !== r1) {
+    throw 'r1 not same';
+  }
+  if (arr2[2] !== r2) {
+    throw 'r2 not same';
+  }
+  if (arr2[3] !== r3) {
+    throw 'r3 not same';
+  }
+  if (arr2[4] !== r4) {
+    throw 'r4 not same';
+  }
+  if (arr2[5] !== r5) {
+    throw 'r5 not same';
+  }
+  if (arr2[6] !== r6) {
+    throw 'r6 not same';
+  }
+  if (arr2[7] !== r7) {
+    throw 'r7 not same';
+  }
 
-  const arr = new Uint8Array([r0, r1, r2, r3, r4, r5, r6, r7]);
-  return arr;
+  return;
 }
+
+// function _split40bits(b0, b1, b2, b3, b4) {
+//   const r0 = (b0 & 0b11111000) >> 3;
+//   const r1 = ((b0 & 0b00000111) << 2) | ((b1 & 0b11000000) >> 6);
+//   const r2 = (b1 & 0b00111110) >> 1;
+//   const r3 = ((b1 & 0b00000001) << 4) | ((b2 & 0b11110000) >> 4);
+//   const r4 = ((b2 & 0b00001111) << 1) | ((b3 & 0b10000000) >> 7);
+//   const r5 = ((b3 & 0b01111100) >> 2);
+//   const r6 = ((b3 & 0b00000011) << 3) | ((b4 & 0b11100000) >> 5);
+//   const r7 = (b4 & 0b00011111);
+
+//   const arr = new Uint8Array([r0, r1, r2, r3, r4, r5, r6, r7]);
+//   return arr;
+// }
 
 function _split40bitsByStr(b0, b1, b2, b3, b4) {
   let src = _byteTobitString(b0);
@@ -156,6 +207,51 @@ function _split40bitsByStr(b0, b1, b2, b3, b4) {
 
   return arr;
 }
+
+
+function _decode8bytesArray(arr) {
+  const b0 = arr[0];
+  const b1 = arr[1];
+  const b2 = arr[2];
+  const b3 = arr[3]
+  const b4 = arr[4];
+  const b5 = arr[5];
+  const b6 = arr[6];
+  const b7 = arr[7]
+
+  const newArr = _pack40bitsByStr(b0, b1, b2, b3, b4, b5, b6, b7);
+  console.log('_decode8bytesArray newArr:', newArr);
+  const resultArray = [];
+  newArr.forEach(b => { resultArray.push(b) });
+
+  return new Uint8Array(resultArray);
+}
+
+function _pack40bitsByStr(b0, b1, b2, b3, b4, b5, b6, b7) {
+  let src = _byteTobitString(b0).substr(-5); // use only 5bits
+  src += _byteTobitString(b1).substr(-5); // use only 5bits
+  src += _byteTobitString(b2).substr(-5); // use only 5bits
+  src += _byteTobitString(b3).substr(-5); // use only 5bits
+  src += _byteTobitString(b4).substr(-5); // use only 5bits
+  src += _byteTobitString(b5).substr(-5); // use only 5bits
+  src += _byteTobitString(b6).substr(-5); // use only 5bits
+  src += _byteTobitString(b7).substr(-5); // use only 5bits
+
+  const arr = new Uint8Array(5);
+  let i = 0;
+  while (src.length > 0) {
+    const chunk = src.substr(0, 8);
+    const rest = src.substr(8);
+    src = rest;
+
+    const byte = parseInt(chunk, 2);
+    arr[i] = byte;
+    i++;
+  }
+
+  return arr;
+}
+
 
 function _byteTobitString(b) {
   const str = ('0000000' + b.toString(2)).substr(-8);
@@ -238,12 +334,21 @@ function _decodeByte(s) {
 
 // ----------------------
 
+function encode5bytes(b0, b1, b2, b3, b4) {
+  //const arr = new Uint8Array(b0, b1, b2, b3, b4);
+  //const str = _encode5bytesArray(arr);
+  const str = _encode5bytesArray([b0, b1, b2, b3, b4]);
+  return str;
+}
+
 //encode32str('ABC');
 
 const b0 = 0b11110000, b1 = 0b00001111;
 //const b0 = 0b11110000, b1=0b11110000;
 //const b0 = 0b00001111, b1=0b00001111;
-const arr = _split40bits(b0, b1, b0, b1, b0);
+//const arr = _split40bits(b0, b1, b0, b1, b0);
+const arr = _split5bytesBy5bits([b0, b1, b0, b1, b0]);
+
 let line = '';
 for (let i = 0; i < arr.length; i++) {
   const str = ('0000' + arr[i].toString(2)).substr(-5);
@@ -251,6 +356,18 @@ for (let i = 0; i < arr.length; i++) {
   line += ' ';
 }
 console.log(line);
+
+const arrdec = _decode8bytesArray(arr);
+line = '';
+for (let i = 0; i < arrdec.length; i++) {
+  const str = ('0000000' + arrdec[i].toString(2)).substr(-8);
+  line += str;
+  line += ' ';
+}
+console.log(line);
+
+
+process.exit(0);
 
 const arr2 = _split40bitsByStr(b0, b1, b0, b1, b0);
 line = '';
@@ -274,6 +391,10 @@ const r = (new TextEncoder).encode('r');
 console.log('r:', r);
 line += _encode5bytesArray(r);
 console.log('encoded=', line);
+
+const fooba2 = (new TextEncoder).encode('fooba');
+line = encode32(fooba2);
+console.log('fooba encoded=', line);
 
 const foobar = (new TextEncoder).encode('foobar');
 line = encode32(foobar);
@@ -301,4 +422,15 @@ if (line !== 'AHM6A83HENMP6TS0C9S6YXVE41K6YY10D9TPTW3K41QQCSBJ41T6GS90DHGQMY90CH
 
 console.log('------ decode --------');
 let ret = decode32('CSQPYRK1');
-console.log(ret);
+console.log('CSQPYRK1-->', ret);
+console.log('fooba:', fooba);
+let decodeStr = decode32str('CSQPYRK1');
+console.log(decodeStr);
+
+console.log('-- array split pack --');
+const arr8 = _split5bytesBy5bits([ 102, 111, 111, 98, 97 ]);
+console.log(arr8);
+const arr5 = _decode8bytesArray(arr8);
+console.log(arr5);
+
+
