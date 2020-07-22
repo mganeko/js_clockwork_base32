@@ -378,7 +378,7 @@ function _decodeByte(s) {
 
   const sUpper = s.toUpperCase();
   const n = decodeHash[sUpper];
-  if (!n) {
+  if ((n === null) || n === undefined) {
     console.error('Byte string decode ERROR', s, n);
     throw 'Byte string decode ERROR';
   }
