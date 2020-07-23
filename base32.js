@@ -1,4 +1,9 @@
+
+// -- refer ---
 // https://gist.github.com/szktty/228f85794e4187882a77734c89c384a8
+// https://medium.com/shiguredo/base32-の変種を作った話-d8da2e3102ec
+// https://github.com/szktty/go-clockwork-base32
+// ----------
 
 /**
  * byte arrayを受け取り、clockwork base32 エンコーディングした文字列を返します
@@ -415,8 +420,15 @@ function compareAarray(arr1, arr2) {
   //console.log(arr1);
   //console.log(arr2);
   if (arr1.length !== arr2.length) {
-    //console.log('compeareAarray length not same %d !== %d', arr1.length, arr2.length);
+    console.log('compeareAarray length not same %d !== %d', arr1.length, arr2.length);
     return false;
+  }
+
+  for (let i = 0; i < arr1.length; i++) {
+    if (arr1[i] !== arr2[i]) {
+      console.log('compeareAarray arr1[%d]=%d arr2[%d]=%d, NOT SAME', i, arr1[i], i, arr2[i]);
+      return false;
+    }
   }
 
   return true;
@@ -572,5 +584,4 @@ testEncodeDecodeArray(new Uint8Array([1, 2, 3]));
 testEncodeDecodeArray(new Uint8Array([1, 2, 3, 4]));
 testEncodeDecodeArray(new Uint8Array([1, 2, 3, 4, 5]));
 testEncodeDecodeArray(new Uint8Array([1, 2, 3, 4, 5, 6]));
-
 
