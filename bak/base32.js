@@ -1,5 +1,3 @@
-//
-//
 
 // -- refer ---
 // https://gist.github.com/szktty/228f85794e4187882a77734c89c384a8
@@ -25,8 +23,8 @@ function encode32(arr) {
 }
 
 /**
- * stringを受け取り、clockwork base32 エンコーディングした文字列を返します
- * @param {string} str - 入力バイト列
+ * stringを受け取り、clockwork base32 エンコーディングしたbyte arrayを返します
+ * @param {Uint8Array} str - 入力バイト列
  * @return {string} - エンコード結果
  */
 function encode32str(str) {
@@ -38,9 +36,9 @@ function encode32str(str) {
 
 
 /**
- * stringを受け取り、clockwork base32 デコードしたバイト列(Uint8Array)を返します
- * @param {string}} str - 入力文字列
- * @return {Uint8Array} - デコード結果
+ * stringを受け取り、clockwork base32 デコードしたバイト列を返します
+ * @param {string}} str - 入力バイト列
+ * @return {Uint8Array} - エンコード結果
  */
 function decode32(str) {
   const arr = [];
@@ -73,8 +71,8 @@ function decode32(str) {
 
 /**
  * stringを受け取り、clockwork base32 デコードしたバイト列を文字列として返します
- * @param {string} str - 入力文字列
- * @return {string} - デコード結果
+ * @param {string} str - 入力バイト列
+ * @return {string} - エンコード結果
  */
 function decode32str(str) {
   const arr = decode32(str);
@@ -84,6 +82,17 @@ function decode32str(str) {
   return decodedStr;
 }
 
+
+/**
+ * バイトアレイを受け取り、5bit毎に分割、バイトアレイで返す
+ *  4バイト(40bit)-->5バイトになる
+ * @param {string}} str - 入力バイト列
+ * @return {Uint8Array} - エンコード結果
+ */
+// function _splitArray8to5bit(arr) {
+//   const newArr = new Uint8Array();
+// }
+
 function _encode5bytesArray(arr) {
   const newArr = _split5bytesBy5bits(arr);
   //console.log('newArr:', newArr);
@@ -92,13 +101,6 @@ function _encode5bytesArray(arr) {
   return str;
 }
 
-// split 8bit-5bytes --> 5bit-8bytes
-//  5 --> 8 
-//  4 --> 7
-//  3 --> 5
-//  2 --> 4
-//  1 --> 2
-//  0 --> 0
 function _split5bytesBy5bits(arr) {
   const len = arr.length;
   //console.log('_split5bytesBy5bits len=', len)
@@ -148,6 +150,13 @@ function _split5bytesBy5bits(arr) {
   return newArr;
 }
 
+// split
+//  5 --> 8 
+//  4 --> 7
+//  3 --> 5
+//  2 --> 4
+//  1 --> 2
+//  0 --> 0
 
 function _dubleCheckSplit(r0, r1, r2, r3, r4, r5, r6, r7, b0, b1, b2, b3, b4) {
   const arr = _split40bitsByStr(b0, b1, b2, b3, b4);
@@ -359,12 +368,12 @@ function _decodeByte(s) {
 
 // ----------------------
 
-// function encode5bytes(b0, b1, b2, b3, b4) {
-//   //const arr = new Uint8Array(b0, b1, b2, b3, b4);
-//   //const str = _encode5bytesArray(arr);
-//   const str = _encode5bytesArray([b0, b1, b2, b3, b4]);
-//   return str;
-// }
+function encode5bytes(b0, b1, b2, b3, b4) {
+  //const arr = new Uint8Array(b0, b1, b2, b3, b4);
+  //const str = _encode5bytesArray(arr);
+  const str = _encode5bytesArray([b0, b1, b2, b3, b4]);
+  return str;
+}
 
 function dumpArrayAs8bit(arr) {
   let str = '';
@@ -560,14 +569,12 @@ console.log('decode lazy dog-->', decodeStr);
 
 //============
 console.log('----test string-----');
-testEncodeDecode('');
-testEncodeDecode('A');
 testEncodeDecode('abc');
 testEncodeDecode('fooba');
 testEncodeDecode('foobar');
 testEncodeDecode('Hello, world!');
 testEncodeDecode('The quick brown fox jumps over the lazy dog.');
-
+testEncodeDecode('');
 
 console.log('----test array-----');
 testEncodeDecodeArray(new Uint8Array([]));
