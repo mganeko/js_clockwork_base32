@@ -9,7 +9,7 @@
 export { encode32, encode32str, decode32, decode32str }
 
 /**
- * byte arrayを受け取り、clockwork base32 エンコーディングした文字列を返します
+ * バイト列(Uint8Array)を受け取り、clockwork base32 エンコーディングした文字列を返します
  * @param {Uint8Array} arr - 入力バイト列
  * @return {string} - エンコード結果
  */
@@ -33,7 +33,6 @@ function encode32(arr) {
 function encode32str(str) {
   const textEncoder = new TextEncoder();
   const arr = textEncoder.encode(str);
-  //console.log('%s -->', str, arr);
   return encode32(arr);
 }
 
@@ -49,26 +48,20 @@ function decode32(str) {
   for (let i = 0; i < str.length; i++) {
     const s = str[i];
     const n = _decodeByte(s);
-    //console.log(s + ' --> ' + n);
     arr.push(n);
   }
   const array5bits = new Uint8Array(arr);
-  //console.log('decode32 str=', str, 'arr=', array5bits);
-  //console.log('decode32 arr-->', dumpArrayAs5bit(array5bits));
 
   let decodedArray = [];
   const buffer = array5bits.buffer;
   const step = 8;
   for (let offset = 0; offset < arr.length; offset += step) {
     const chunkArray = new Uint8Array(buffer, offset, Math.min((arr.length - offset), step));
-    //console.log('offset=', offset);
     const arr8 = _pack5bitArrayAs8bitArray(chunkArray);
     decodedArray = decodedArray.concat(arr8);
   }
-  //console.log('decode32 decodedArray=', decodedArray);
 
   const byteArray = new Uint8Array(decodedArray);
-  //console.log('decode32 byteArray=', byteArray);
   return byteArray;
 }
 
@@ -102,10 +95,9 @@ function _encode5bytesArray(arr) {
 //  0 --> 0
 function _split5bytesBy5bits(arr) {
   const len = arr.length;
-  //console.log('_split5bytesBy5bits len=', len)
-  if (len > 5) {
-    console.warn('WARN: _split5bytesBy5bits() more than 5 bytes, cut 5 bytes only')
-  }
+  // if (len > 5) {
+  //   console.warn('WARN: _split5bytesBy5bits() more than 5 bytes, cut 5 bytes only')
+  // }
   const b0 = (len > 0) ? arr[0] : 0;
   const b1 = (len > 1) ? arr[1] : 0;
   const b2 = (len > 2) ? arr[2] : 0;
@@ -212,9 +204,9 @@ function _split40bitsByStr(b0, b1, b2, b3, b4) {
 //  0 <-- 0
 function _pack5bitArrayAs8bitArray(arr) {
   const len = arr.length;
-  if (len > 8) {
-    console.warn('WARN: _pack5bitArrayAs8bitArray() more than 8 bytes, cut 8 bytes only')
-  }
+  // if (len > 8) {
+  //   console.warn('WARN: _pack5bitArrayAs8bitArray() more than 8 bytes, cut 8 bytes only')
+  // }
   const b0 = (len > 0) ? arr[0] : 0;
   const b1 = (len > 1) ? arr[1] : 0;
   const b2 = (len > 2) ? arr[2] : 0;
@@ -261,11 +253,9 @@ function _pack5bitArrayAs8bitArray(arr) {
     throw "BAD pack length:" + len;
   }
   else {
-    //newArr = new Uint8Array();
     newArr = [];
   }
 
-  //console.log('_pack5bitArrayAs8bitArray arr.len=%d, newArr.len=%d', arr.length, newArr.length, newArr);
   return newArr;
 }
 
@@ -299,7 +289,6 @@ function _pack40bitsByStr(b0, b1, b2, b3, b4, b5, b6, b7) {
   src += _byteTobitString(b5).substr(-5); // use only 5bits
   src += _byteTobitString(b6).substr(-5); // use only 5bits
   src += _byteTobitString(b7).substr(-5); // use only 5bits
-  //console.log('40bits str=', src);
 
   const arr = new Uint8Array(5);
   let i = 0;
