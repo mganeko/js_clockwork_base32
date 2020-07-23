@@ -1,0 +1,23 @@
+{
+  "name": "clockwork_base32",
+  "version": "1.0.0",
+  "description": "javascript implementation of clockwork base32",
+  "main": "test_nodejs.mjs",
+  "scripts": {
+    "test": "node test_nodejs.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mganeko/js_clockwork_base32.git"
+  },
+  "keywords": [
+    "base32",
+    "javascript"
+  ],
+  "author": "mganeko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mganeko/js_clockwork_base32/issues"
+  },
+  "homepage": "https://github.com/mganeko/js_clockwork_base32#readme"
+}

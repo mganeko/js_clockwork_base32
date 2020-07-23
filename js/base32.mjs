@@ -1,4 +1,4 @@
-// javascript imprementation for Clockwork Base32
+// javascript implementation for Clockwork Base32
 //
 // -- refer ---
 // https://gist.github.com/szktty/228f85794e4187882a77734c89c384a8
