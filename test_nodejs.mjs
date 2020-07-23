@@ -45,7 +45,9 @@ erros += testEncodeDecodeArray(new Uint8Array([1, 2, 3, 4, 5])); cases++;
 erros += testEncodeDecodeArray(new Uint8Array([1, 2, 3, 4, 5, 6])); cases++;
 
 // --- report ---
-console.log('--- total errors=%d/cases=%s ---', erros, cases);
+console.log('=== total report =====');
+console.log(' case count=', cases);
+console.log(' ERROR count=', erros);
 
 // ---- exit ---
 if (erros > 0) {
