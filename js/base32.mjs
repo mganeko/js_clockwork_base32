@@ -8,6 +8,9 @@
 
 export { encode32, encode32str, decode32, decode32str }
 
+// -- double check with another bit operation logic ---
+const _DOUBLE_CHECK = true;
+
 /**
  * バイト列(Uint8Array)を受け取り、clockwork base32 エンコーディングした文字列を返します
  * @param {Uint8Array} arr - 入力バイト列
@@ -115,7 +118,9 @@ function _split5bytesBy5bits(arr) {
   const r7 = (b4 & 0b00011111);
 
   // --- double check with another logic ---
-  _dubleCheckSplit(r0, r1, r2, r3, r4, r5, r6, r7, b0, b1, b2, b3, b4);
+  if (_DOUBLE_CHECK) {
+    _dubleCheckSplit(r0, r1, r2, r3, r4, r5, r6, r7, b0, b1, b2, b3, b4);
+  }
 
   // --- pack to array ---
   let newArr = null;
@@ -224,7 +229,9 @@ function _pack5bitArrayAs8bitArray(arr) {
   const r4 = ((b6 & 0b00000111) << 5) | (b7 & 0b00011111);
 
   // --- double check with another logic ---
-  _dubleCheckPack(r0, r1, r2, r3, r4, b0, b1, b2, b3, b4, b5, b6, b7);
+  if (_DOUBLE_CHECK) {
+    _dubleCheckPack(r0, r1, r2, r3, r4, b0, b1, b2, b3, b4, b5, b6, b7);
+  }
 
   // --- pack to array ---
   let newArr = null;
@@ -311,12 +318,13 @@ function _byteTobitString(b) {
   return str;
 }
 
+const _encodeTable = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M',
+  'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'
+];
+
 function _encodeByte(b) {
-  const encodeTable = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M',
-    'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'
-  ];
-  if (encodeTable.length !== 32) {
+  if (_encodeTable.length !== 32) {
     console.error('TABLE error');
     throw 'TABLE error';
   }
@@ -325,21 +333,22 @@ function _encodeByte(b) {
     throw 'Byte value range ERROR';
   }
 
-  return encodeTable[b];
+  return _encodeTable[b];
 }
 
-function _decodeByte(s) {
-  const decodeHash = {
-    '0': 0, 'O': 0,
-    '1': 1, 'L': 1, 'I': 1,
-    '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
-    'A': 10, 'B': 11, 'C': 12, 'D': 13, 'E': 14, 'F': 15,
-    'G': 16, 'H': 17, 'J': 18, 'K': 19, 'M': 20, 'N': 21, 'P': 22, 'Q': 23,
-    'R': 24, 'S': 25, 'T': 26, 'V': 27, 'W': 28, 'X': 29, 'Y': 30, 'Z': 31,
-  };
+const _decodeHash = {
+  '0': 0, 'O': 0,
+  '1': 1, 'L': 1, 'I': 1,
+  '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9,
+  'A': 10, 'B': 11, 'C': 12, 'D': 13, 'E': 14, 'F': 15,
+  'G': 16, 'H': 17, 'J': 18, 'K': 19, 'M': 20, 'N': 21, 'P': 22, 'Q': 23,
+  'R': 24, 'S': 25, 'T': 26, 'V': 27, 'W': 28, 'X': 29, 'Y': 30, 'Z': 31,
+};
 
+
+function _decodeByte(s) {
   const sUpper = s.toUpperCase();
-  const n = decodeHash[sUpper];
+  const n = _decodeHash[sUpper];
   if ((n === null) || n === undefined) {
     console.error('Byte string decode ERROR', s, n);
     throw 'Byte string decode ERROR';
