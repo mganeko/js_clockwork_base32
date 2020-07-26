@@ -17,6 +17,7 @@ const _DOUBLE_CHECK = true;
  * @return {string} - エンコード結果
  */
 function encode32(arr) {
+  /*---
   const buffer = arr.buffer;
   let str = '';
 
@@ -25,6 +26,12 @@ function encode32(arr) {
     const chunkArray = new Uint8Array(buffer, offset, Math.min((arr.length - offset), step));
     str += _encode5bytesArray(chunkArray);
   }
+  return str;
+  --*/
+
+  const newArr = _splitBytesBy5bits(arr);
+  let str = '';
+  newArr.forEach(b => { str += _encodeByte(b) });
   return str;
 }
 
