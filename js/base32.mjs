@@ -82,8 +82,20 @@ function decode32str(str) {
 }
 
 function _encode5bytesArray(arr) {
-  const newArr = _split5bytesBy5bits(arr);
-  //console.log('newArr:', newArr);
+  //const newArr1 = _split5bytesBy5bits(arr);
+  //console.log('newArr1:', newArr1);
+
+  const newArr = _splitBytesBy5bits(arr);
+  //console.log('newArr:', newArr1);
+
+  if (_DOUBLE_CHECK) {
+    const newArr1 = _split5bytesBy5bits(arr);
+    const check = _compareAarray(newArr, newArr1);
+    if (!check) {
+      throw "_encode5bytesArray double check ERROR";
+    }
+  }
+
   let str = '';
   newArr.forEach(b => { str += _encodeByte(b) });
   return str;
@@ -146,6 +158,54 @@ function _split5bytesBy5bits(arr) {
   return newArr;
 }
 
+function _splitBytesBy5bits(srcArr) {
+  const srcLen = srcArr.length;
+  if (srcLen < 1) {
+    //throw ' _split8BitsBytesBy5bits NO src byte';
+    return new Uint8Array([]);
+  }
+  let destBitLength = 0;
+  let destArr = [];
+  let destByte = 0;
+
+  for (let srcIdx = 0; srcIdx < srcLen; srcIdx++) {
+    const srcByte = srcArr[srcIdx];
+    for (let srcBitPos = 7; srcBitPos >= 0; srcBitPos--) { // srcBitPos : 76543210
+      const bit1 = (srcByte >> srcBitPos) & 0b00000001;
+      destByte = destByte << 1;
+      destByte = destByte | bit1;
+      destBitLength++;
+      if (destBitLength >= 5) {
+        // next dest byte
+        destArr.push(destByte);
+        destBitLength = 0;
+        destByte = 0;
+      }
+    }
+  }
+  if (destBitLength > 0) {
+    destByte = destByte << (5 - destBitLength);
+    destArr.push(destByte);
+  }
+
+  return new Uint8Array(destArr);
+}
+
+function _compareAarray(arr1, arr2) {
+  if (arr1.length !== arr2.length) {
+    console.error('compeareAarray length not same %d !== %d', arr1.length, arr2.length);
+    return false;
+  }
+
+  for (let i = 0; i < arr1.length; i++) {
+    if (arr1[i] !== arr2[i]) {
+      console.error('compeareAarray arr1[%d]=%d arr2[%d]=%d, NOT SAME', i, arr1[i], i, arr2[i]);
+      return false;
+    }
+  }
+
+  return true;
+}
 
 function _dubleCheckSplit(r0, r1, r2, r3, r4, r5, r6, r7, b0, b1, b2, b3, b4) {
   const arr = _split40bitsByStr(b0, b1, b2, b3, b4);
@@ -200,9 +260,9 @@ function _split40bitsByStr(b0, b1, b2, b3, b4) {
 }
 
 
-// pack
-//  5 <-- 8 
-//  4 <-- 7
+// pack  8bit-5bytes <-- 5bit-8bytes
+//  5 <-- 8
+//  4 <-- 7 
 //  3 <-- 5
 //  2 <-- 4
 //  1 <-- 2
