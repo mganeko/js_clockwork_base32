@@ -34,7 +34,9 @@
   console.log('----test string-----');
   erros += testEncodeDecode(''); cases++;
   erros += testEncodeDecode('A'); cases++;
+  erros += testEncodeDecode('AB'); cases++;
   erros += testEncodeDecode('abc'); cases++;
+  erros += testEncodeDecode('AbCd'); cases++;
   erros += testEncodeDecode('fooba'); cases++;
   erros += testEncodeDecode('foobar'); cases++;
   erros += testEncodeDecode('Hello, mjs world!'); cases++;
