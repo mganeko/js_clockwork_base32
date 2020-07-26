@@ -28,7 +28,9 @@ erros += testDecodeStr('Wow, it really works!', 'AXQQEB10D5T20WK5C5P6RY90EXQQ4TV
 console.log('----test string-----');
 erros += testEncodeDecode(''); cases++;
 erros += testEncodeDecode('A'); cases++;
+erros += testEncodeDecode('AB'); cases++;
 erros += testEncodeDecode('abc'); cases++;
+erros += testEncodeDecode('AbCd'); cases++;
 erros += testEncodeDecode('fooba'); cases++;
 erros += testEncodeDecode('foobar'); cases++;
 erros += testEncodeDecode('Hello, mjs world!'); cases++;
