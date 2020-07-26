@@ -52,7 +52,8 @@ function testEncodeDecode(str) {
 function testEncodeDecodeArray(arr) {
   const encodedStr = encode32(arr);
   const decodedArr = decode32(encodedStr);
-  const test = compareAarray(arr, decodedArr)
+  //const test = compareAarray(arr, decodedArr);
+  const test = compareAarrayWithType(arr, decodedArr, Uint8Array);
   console.assert(test, 'Encode-Decode Error:', arr, '-->', decodedArr);
 
   if (test) {
@@ -84,3 +85,15 @@ function compareAarray(arr1, arr2) {
   return true;
 }
 
+function compareAarrayWithType(arr1, arr2, t) {
+  if (!(arr1 instanceof t)) {
+    console.error('compareAarrayWithType arr1 is not type:', t, 'arr1:', arr1);
+    return false;
+  }
+  if (!(arr2 instanceof t)) {
+    console.error('compareAarrayWithType arr2 is not type:', t, 'arr2:', arr2);
+    return false;
+  }
+
+  return compareAarray(arr1, arr2);
+}
