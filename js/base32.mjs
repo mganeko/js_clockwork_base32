@@ -17,7 +17,6 @@ const _DOUBLE_CHECK = true;
  * @return {string} - エンコード結果
  */
 function encode32(arr) {
-  /*---
   const buffer = arr.buffer;
   let str = '';
 
@@ -27,12 +26,11 @@ function encode32(arr) {
     str += _encode5bytesArray(chunkArray);
   }
   return str;
-  --*/
 
-  const newArr = _splitBytesBy5bits(arr);
-  let str = '';
-  newArr.forEach(b => { str += _encodeByte(b) });
-  return str;
+  // const newArr = _splitBytesBy5bits(arr);
+  // let str = '';
+  // newArr.forEach(b => { str += _encodeByte(b) });
+  // return str;
 }
 
 /**
@@ -67,9 +65,24 @@ function decode32(str) {
   const step = 8;
   for (let offset = 0; offset < arr.length; offset += step) {
     const chunkArray = new Uint8Array(buffer, offset, Math.min((arr.length - offset), step));
-    const arr8 = _pack5bitArrayAs8bitArray(chunkArray);
+    //const arr8 = _pack5bitArrayAs8bitArray(chunkArray);
+    const arr8 = _pack5bitsArrayAsBytes(chunkArray);
+
+    if (_DOUBLE_CHECK) {
+      //const anotherArr = _pack5bitsArrayAsBytes(chunkArray);
+      const anotherArr = _pack5bitArrayAs8bitArray(chunkArray);
+      console.log('arr8=', arr8);
+      console.log('anonter=', anotherArr);
+      const check = _compareAarray(anotherArr, arr8);
+      if (!check) {
+        throw "_pack5bitArrayAs8bitArray double check ERROR";
+      }
+    }
+
     decodedArray = decodedArray.concat(arr8);
   }
+
+  //const decodedArray = _pack5bitsArrayAsBytes(array5bits);
 
   const byteArray = new Uint8Array(decodedArray);
   return byteArray;
@@ -331,6 +344,45 @@ function _pack5bitArrayAs8bitArray(arr) {
   }
 
   return newArr;
+}
+
+function _pack5bitsArrayAsBytes(srcArr) {
+  const srcLen = srcArr.length;
+  //console.log('_pack5bitsArrayAsBytes srcLen=', srcLen);
+  if (srcLen < 1) {
+    //throw ' _pack5bitsArrayAsBytes NO src byte';
+    return new Uint8Array([]);
+  }
+  let destBitLength = 0;
+  let destArr = [];
+  let destByte = 0;
+
+  for (let srcIdx = 0; srcIdx < srcLen; srcIdx++) {
+    const srcByte = srcArr[srcIdx];
+    for (let srcBitPos = 4; srcBitPos >= 0; srcBitPos--) { // srcBitPos : xxx43210
+      const bit1 = (srcByte >> srcBitPos) & 0b00000001;
+      destByte = destByte << 1;
+      destByte = destByte | bit1;
+      destBitLength++;
+      if (destBitLength >= 8) {
+        // next dest byte
+        destArr.push(destByte);
+        destBitLength = 0;
+        destByte = 0;
+        //console.log('==_pack5bitsArrayAsBytes newDest byte');
+      }
+    }
+  }
+
+  // --- rest is padding, so leave them (not neet to append)
+  // if (destBitLength > 0) {
+  //   console.log('==_pack5bitsArrayAsBytes rest bitts=', destBitLength);
+  //   destByte = destByte << (8 - destBitLength);
+  //   destArr.push(destByte);
+  // }
+
+  //return new Uint8Array(destArr);
+  return destArr;
 }
 
 function _dubleCheckPack(r0, r1, r2, r3, r4, b0, b1, b2, b3, b4, b5, b6, b7) {
