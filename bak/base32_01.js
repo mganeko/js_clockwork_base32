@@ -68,7 +68,7 @@ function decode32(str) {
  */
 function decode32str(str) {
   const arr = decode32(str);
- 
+
   const decoder = new TextDecoder();
   const decodedStr = decoder.decode(arr);
   return decodedStr;
@@ -116,7 +116,7 @@ function _split5bytesBy5bits(arr) {
   const r7 = (b4 & 0b00011111);
 
   // --- double check with another logic ---
-  _dubleCheckSplit(r0, r1, r2, r3, r4, r5, r6, r7, b0, b1, b2, b3, b4);
+  //_dubleCheckSplit(r0, r1, r2, r3, r4, r5, r6, r7, b0, b1, b2, b3, b4);
 
   // --- pack to array ---
   let newArr = null;
@@ -428,7 +428,7 @@ let decodeStr = decode32str('CSQPYRK1');
 console.log(decodeStr);
 
 console.log('-- array split pack --');
-const arr8 = _split5bytesBy5bits([ 102, 111, 111, 98, 97 ]);
+const arr8 = _split5bytesBy5bits([102, 111, 111, 98, 97]);
 console.log(arr8);
 const arr5 = _decode8bytesArray(arr8);
 console.log(arr5);
