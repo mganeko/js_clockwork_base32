@@ -1,4 +1,4 @@
-# clockwork_base32
+# js_clockwork_base32
 
 JavaScript implementation of Clockwork Base32
 
