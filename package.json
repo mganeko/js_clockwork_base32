@@ -4,7 +4,7 @@
   "description": "javascript implementation of clockwork base32",
   "main": "test_nodejs.mjs",
   "scripts": {
-    "test": "node test_nodejs.mjs"
+    "test": "node --experimental-modules test_nodejs.mjs"
   },
   "repository": {
     "type": "git",
