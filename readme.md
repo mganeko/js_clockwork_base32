@@ -20,7 +20,7 @@ JavaScript implementation of Clockwork Base32
   const encode2 = encode32str('ABC');
 
   // base32 string --> str
-  const decocd2 = decoded32str(encode2);
+  const decocd2 = decode32str(encode2);
 ```
 
 # License
